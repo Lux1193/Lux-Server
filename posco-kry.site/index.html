@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POSCO KRY TOOLBOX</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-top">
+      <span class="eyebrow">Internal Tools · Quick Launch Panel</span>
+      <span class="status-pill"><span class="dot"></span>ALL SYSTEMS ONLINE</span>
+    </div>
+    <h1 class="title">POSCO <span>KRY</span> TOOLBOX</h1>
+    <p class="subtitle" id="clock">SYSTEM READY</p>
+  </header>
+
+  <div class="section-label">Registered Sites</div>
+  <div class="grid" id="grid"></div>
+
+  <footer class="footer">
+    <span>POSCO KRY TOOLBOX</span>
+    <span id="count">0 sites linked</span>
+  </footer>
+
+</div>
+
+<script src="sites.js"></script>
+<script>
+  const grid = document.getElementById('grid');
+  const countEl = document.getElementById('count');
+
+  function render(sites){
+    if(!sites || sites.length === 0){
+      grid.innerHTML = '<div class="empty">등록된 사이트가 없습니다. sites.js에 항목을 추가하세요.</div>';
+      countEl.textContent = '0 sites linked';
+      return;
+    }
+
+    grid.innerHTML = sites.map((s, i) => {
+      const code = (s.id || String(i + 1).padStart(2, '0'));
+      const href = './' + s.path.replace(/^\.?\//, '').replace(/\/$/, '') + '/index.html';
+      return `
+        <a class="card" href="${href}">
+          <span class="rivet tl"></span><span class="rivet tr"></span>
+          <span class="rivet bl"></span><span class="rivet br"></span>
+          <div class="card-head">
+            <span class="card-id">${escapeHtml(code)}</span>
+            <span class="led"></span>
+          </div>
+          <div>
+            <div class="card-name">${escapeHtml(s.name || s.path)}</div>
+            <div class="card-desc">${escapeHtml(s.desc || '')}</div>
+          </div>
+          <div class="card-foot">
+            <span>OPEN</span>
+            <span class="arrow">&#8594;</span>
+          </div>
+        </a>`;
+    }).join('');
+
+    countEl.textContent = sites.length + ' site' + (sites.length > 1 ? 's' : '') + ' linked';
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  render(typeof SITES !== 'undefined' ? SITES : []);
+
+  function updateClock(){
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const str = `${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} — ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+    document.getElementById('clock').textContent = str;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+
+</body>
+</html>

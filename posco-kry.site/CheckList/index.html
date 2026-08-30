@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POSCO KRY TOOLBOX - 안전등급 진단</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #12161b;
+            --bg-elev: #171c22;
+            --panel: #1a2028;
+            --panel-hover: #1f2630;
+            --border: #2b3440;
+            --border-strong: #3a4552;
+            --amber: #f2a93b;
+            --amber-dim: #8a6423;
+            --green: #3ddc97;
+            --red: #ff5c5c;
+            --text: #eef1f4;
+            --text-dim: #8a94a1;
+            --text-faint: #5b6472;
+            --mono: 'IBM Plex Mono', ui-monospace, monospace;
+            --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            background-image:
+                linear-gradient(var(--bg-elev) 1px, transparent 1px),
+                linear-gradient(90deg, var(--bg-elev) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: center top;
+        }
+
+        .wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        /* ── Header / Navigation ───────────────────── */
+        .tool-header {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: linear-gradient(180deg, var(--bg-elev), var(--bg));
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .tool-header::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--amber), transparent 60%);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--amber);
+            text-decoration: none;
+            font-family: var(--mono);
+            font-size: 12px;
+            letter-spacing: .08em;
+            font-weight: 500;
+            margin-bottom: 8px;
+            transition: opacity 0.15s ease;
+        }
+        .back-link:hover { opacity: 0.8; }
+
+        .tool-title {
+            font-family: var(--mono);
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: .02em;
+        }
+
+        /* ── Main Panel ───────────────────────────── */
+        .tool-panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 28px;
+            position: relative;
+        }
+
+        /* Rivet Details */
+        .rivet {
+            position: absolute;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--border-strong);
+        }
+        .rivet.tl { top: 8px; left: 8px; }
+        .rivet.tr { top: 8px; right: 8px; }
+        .rivet.bl { bottom: 8px; left: 8px; }
+        .rivet.br { bottom: 8px; right: 8px; }
+
+        /* Table Design */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--bg-elev);
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        .check-cell {
+            width: 70px;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-strong);
+            border-radius: 3px;
+            background: var(--bg);
+            cursor: pointer;
+            position: relative;
+            vertical-align: middle;
+            transition: all 0.15s ease;
+        }
+
+        input[type="checkbox"]:checked {
+            background: var(--amber);
+            border-color: var(--amber);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: "✓";
+            position: absolute;
+            color: var(--bg);
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--amber);
+            color: var(--bg);
+            border: none;
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        .btn-submit:hover {
+            background: #e0982e;
+            transform: translateY(-1px);
+        }
+
+        /* ── Modal Design ─────────────────────────── */
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 22, 27, 0.85);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: var(--panel);
+            border: 1px solid var(--border-strong);
+            padding: 32px;
+            border-radius: 6px;
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal-title {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        #gradeOutput {
+            font-family: var(--mono);
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 12px 0;
+            line-height: 1;
+        }
+
+        .info-msg {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            word-break: keep-all;
+        }
+
+        .info-msg b {
+            color: var(--text);
+            display: block;
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .btn-close {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border-strong);
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-close:hover {
+            background: var(--panel-hover);
+            border-color: var(--amber-dim);
+        }
+
+        @media (max-width: 520px) {
+            .wrap { padding: 24px 16px 40px; }
+            .tool-header { padding: 20px; }
+            .tool-panel { padding: 20px; }
+            th, td { padding: 10px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <header class="tool-header">
+        <a href="../index.html" class="back-link">&#8592; BACK TO TOOLBOX</a>
+        <h1 class="tool-title">SAFETY GRADE DIAGNOSIS</h1>
+    </header>
+
+    <main class="tool-panel">
+        <span class="rivet tl"></span><span class="rivet tr"></span>
+        <span class="rivet bl"></span><span class="rivet br"></span>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>업무 내용</th>
+                        <th class="check-cell">선택</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>외부용역(메이커) 단독작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="B"></td></tr>
+                    <tr><td>화기작업이 있으나 화재위험이 없는 환경</td><td class="check-cell"><input type="checkbox" class="chk" data-g="B"></td></tr>
+                    <tr><td>천정크레인, 지게차를 사용하지만 단순 하역작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="B"></td></tr>
+                    <tr><td>추락이나 화재의 위험이 없는 단순 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="B"></td></tr>
+                    <tr><td>일용직이 포함된 인력 혼재작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>전기, 토목, 비계, 등 혼재작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>계약업체에서 재하도된 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>15일 이상 설치/철거 작업(프로그램 관련작업 제외)</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>구동기기 팬스내 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>추락의 위험이 있는 벽체, 지붕, 설치/철거 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>화재 및 폭발의 위험이 있는 장소의 15M 이내 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>20톤 이상 이동식 크레인 작업 등 중장비 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>충전전로 근처 등 고압 전기 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>방사선 관리구역 내 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="A"></td></tr>
+                    <tr><td>대형 설비 및 연구장치 설치/철거 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="S"></td></tr>
+                    <tr><td>복층 구조물 설치/해체 작업(H빔 등)</td><td class="check-cell"><input type="checkbox" class="chk" data-g="S"></td></tr>
+                    <tr><td>마이크로파일 등 파일시공 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="S"></td></tr>
+                    <tr><td>질식 및 중독의 위험이 있는 밀폐공간 작업</td><td class="check-cell"><input type="checkbox" class="chk" data-g="S"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button class="btn-submit" onclick="getResult()">DIAGNOSE / 결과 확인</button>
+    </main>
+
+</div>
+
+<div id="modal">
+    <div class="modal-box">
+        <span class="rivet tl"></span><span class="rivet tr"></span>
+        <span class="rivet bl"></span><span class="rivet br"></span>
+        
+        <div class="modal-title">DIAGNOSIS RESULT</div>
+        <div id="gradeOutput">-</div>
+        <div id="msgOutput" class="info-msg"></div>
+        <button class="btn-close" onclick="closeModal()">CLOSE</button>
+    </div>
+</div>
+
+<script>
+    function getResult() {
+        const chks = document.querySelectorAll('.chk');
+        const map = { 'S': 3, 'A': 2, 'B': 1 };
+        let top = 0;
+        let res = "";
+
+        chks.forEach(c => {
+            if(c.checked) {
+                let score = map[c.dataset.g];
+                if(score > top) { top = score; res = c.dataset.g; }
+            }
+        });
+
+        const out = document.getElementById('gradeOutput');
+        const msgOut = document.getElementById('msgOutput');
+
+        const contentMap = {
+            'S': {
+                color: 'var(--red)',
+                text: '특별관리 위험 등급입니다.<br><b>연구원장 및 제철소 부소장</b> 최종보고 하시기 바랍니다.'
+            },
+            'A': {
+                color: 'var(--amber)',
+                text: '고위험작업 중점관리 등급입니다.<br><b>연구소장 및 제철소 부장</b> 최종보고 하시기 바랍니다.'
+            },
+            'B': {
+                color: 'var(--green)',
+                text: '일상작업 등급입니다.<br><b>그룹장 및 공장장</b> 최종보고 하시기 바랍니다.'
+            }
+        };
+
+        if(top === 0) {
+            out.innerText = "N/A";
+            out.style.color = "var(--text-faint)";
+            msgOut.innerHTML = "항목을 선택해 주세요.";
+        } else {
+            out.innerText = res;
+            out.style.color = contentMap[res].color;
+            msgOut.innerHTML = contentMap[res].text;
+        }
+        
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+</script>
+
+</body>
+</html>

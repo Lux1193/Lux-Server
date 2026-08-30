@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POSCO KRY TOOLBOX - 약속 남은 시간 계산기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12161b;
+    --bg-elev: #171c22;
+    --panel: #1a2028;
+    --panel-hover: #1f2630;
+    --border: #2b3440;
+    --border-strong: #3a4552;
+    --amber: #f2a93b;
+    --amber-dim: #8a6423;
+    --green: #3ddc97;
+    --red: #ff5c5c;
+    --text: #eef1f4;
+    --text-dim: #8a94a1;
+    --text-faint: #5b6472;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    background-image:
+      linear-gradient(var(--bg-elev) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-elev) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center top;
+  }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Header / Navigation ───────────────────── */
+  .tool-header {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--bg-elev), var(--bg));
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .tool-header::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amber), transparent 60%);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--amber);
+    text-decoration: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .08em;
+    font-weight: 500;
+    margin-bottom: 8px;
+    transition: opacity 0.15s ease;
+  }
+  .back-link:hover { opacity: 0.8; }
+
+  .tool-title {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: .02em;
+  }
+
+  /* ── Main Panel ───────────────────────────── */
+  .tool-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 32px;
+    position: relative;
+  }
+
+  /* Rivet Details */
+  .rivet {
+    position: absolute;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border-strong);
+  }
+  .rivet.tl { top: 8px; left: 8px; }
+  .rivet.tr { top: 8px; right: 8px; }
+  .rivet.bl { bottom: 8px; left: 8px; }
+  .rivet.br { bottom: 8px; right: 8px; }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  /* Input Styling */
+  input[type="datetime-local"] {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.15s ease;
+    color-scheme: dark;
+  }
+
+  input[type="datetime-local"]:focus {
+    border-color: var(--amber);
+  }
+
+  /* Submit Button */
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--amber);
+    color: var(--bg);
+    border: none;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .btn-submit:hover {
+    background: #e0982e;
+    transform: translateY(-1px);
+  }
+
+  /* Result Box */
+  #result {
+    margin-top: 28px;
+    padding: 24px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: center;
+    font-family: var(--mono);
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .result-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .result-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  .result-error {
+    font-size: 14px;
+    color: var(--red);
+  }
+
+  @media (max-width: 520px) {
+    .wrap { padding: 24px 16px 40px; }
+    .tool-header { padding: 20px; }
+    .tool-panel { padding: 20px; }
+    .result-value { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="tool-header">
+    <a href="../index.html" class="back-link">&#8592; BACK TO TOOLBOX</a>
+    <h1 class="tool-title">COUNTDOWN TIMER</h1>
+  </header>
+
+  <main class="tool-panel">
+    <span class="rivet tl"></span><span class="rivet tr"></span>
+    <span class="rivet bl"></span><span class="rivet br"></span>
+
+    <div class="form-group">
+      <label for="target">Target Date & Time / 약속 시간 입력</label>
+      <input type="datetime-local" id="target">
+    </div>
+
+    <button class="btn-submit" onclick="calc()">CALCULATE / 계산</button>
+
+    <div id="result">
+      <span class="result-label">Status</span>
+      <span style="color: var(--text-faint); font-size: 14px;">시간을 선택하고 계산 버튼을 누르세요.</span>
+    </div>
+  </main>
+
+</div>
+
+<script>
+function calc(){
+    const targetVal = document.getElementById("target").value;
+    const resultEl = document.getElementById("result");
+
+    if(!targetVal){
+        resultEl.innerHTML = `
+            <span class="result-label">Error</span>
+            <span class="result-error">날짜와 시간을 입력하세요.</span>
+        `;
+        return;
+    }
+
+    const target = new Date(targetVal);
+    const now = new Date();
+    const diff = target - now;
+
+    if(isNaN(target.getTime())){
+        resultEl.innerHTML = `
+            <span class="result-label">Error</span>
+            <span class="result-error">올바른 날짜와 시간을 입력하세요.</span>
+        `;
+        return;
+    }
+
+    if(diff < 0){
+        resultEl.innerHTML = `
+            <span class="result-label">Status</span>
+            <span class="result-error">약속 시간이 이미 지났습니다.</span>
+        `;
+        return;
+    }
+
+    const minutes = Math.floor(diff / 1000 / 60);
+
+    resultEl.innerHTML = `
+        <span class="result-label">Time Remaining</span>
+        <div class="result-value">${minutes.toLocaleString()}분</div>
+    `;
+}
+</script>
+
+</body>
+</html>
