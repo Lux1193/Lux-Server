@@ -26,6 +26,12 @@ const SITES = [
     desc: "현장작업 안전등급 미리보기",
     path: "CheckList",
   },
+  {
+    id: "Guestbook",
+    name: "방명록",
+    desc: "한마디 남기고 가세요",
+    path: "Guestbook",
+  },
   // 여기 아래에 계속 추가하면 됩니다. 예시:
   // {
   //   id: "NET-01",
