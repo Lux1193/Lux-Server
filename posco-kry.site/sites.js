@@ -32,6 +32,12 @@ const SITES = [
     desc: "한마디 남기고 가세요",
     path: "Guestbook",
   },
+  {
+    id: "Inventory",
+    name: "재고관리",
+    desc: "베란다/서랍 보관 물품 재고 조회",
+    path: "Inventory",
+  },
   // 여기 아래에 계속 추가하면 됩니다. 예시:
   // {
   //   id: "NET-01",
